@@ -103,6 +103,10 @@ def skinmenu():
     running = True
     while running:
         for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_c:
+                    running = False
+                    mainmenu()
             if event.type == pygame.QUIT: running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if back_btn.collidepoint(event.pos):
@@ -114,14 +118,19 @@ def skinmenu():
 
 
 # Configuration
+played_200 = False
+played_300 = False
+steps = 0
 CELL_SIZE = 19      # pixels per cell
 MAZE_COLS = 26      # number of columns
 MAZE_ROWS = 25      # number of rows
 WALL_COLOR = (40, 40, 40)
 BG_COLOR = (220, 220, 220)
-PLAYER_COLOR = (0, 150, 30)
 GOAL_COLOR = (30, 160, 30)
 FPS = 60
+pygame.mixer.init()
+sound_200 = pygame.mixer.Sound("200.wav")
+sound_300 = pygame.mixer.Sound("300.wav")
 #wins
 
 try:
@@ -222,23 +231,27 @@ def draw_maze(surface, grid, cols, rows, cell_size):
 def main():
     pygame.init()
     canwin = True
+    steps = 0
     cols, rows = MAZE_COLS, MAZE_ROWS
     width = cols * CELL_SIZE
     height = rows * CELL_SIZE
+    played_200 = False
+    played_300 = False
 
     pygame.display.set_caption("Maze Game")
     clock = pygame.time.Clock()
     font = pygame.font.SysFont(None, 28)
     small_font = pygame.font.Font(None, 23) 
 
-
     def new_game():
+        played_200 = False
+        played_300 = False
+        steps = 0
         grid = generate_maze(cols, rows)
         player = [0, 0]  # col, row
         goal = [cols - 1, rows - 1]
         start_time = time.time()
         won = False
-        steps = 0
         return grid, player, goal, start_time, won, steps
 
     grid, player, goal, start_time, won, steps = new_game()
@@ -246,13 +259,31 @@ def main():
     running = True
     while running:
         dt = clock.tick(FPS)
+        col, row = player
+        if steps >= 300:
+            PLAYER_COLOR = (255, 0, 0)
+        elif steps >= 200:
+            PLAYER_COLOR = (255, 126, 0)
+        else:
+            PLAYER_COLOR = (0, 150, 30)
+        if steps >= 300 and played_300 == False:
+            sound_300.play()
+            played_300 = True
+        elif steps >= 200 and played_200 == False:
+            sound_200.play()
+            played_200 = True
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+        
 
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:
                     grid, player, goal, start_time, won, steps = new_game()
+                elif event.key == pygame.K_c:
+                    running = False
+                    mainmenu()
+
 
                 if not won:
                     moved = False
@@ -283,6 +314,7 @@ def main():
                             won = True
                             win_time = time.time() - start_time
 
+
         # draw
         screen.fill((125, 115, 105))
         draw_maze(screen, grid, cols, rows, CELL_SIZE)
@@ -300,7 +332,7 @@ def main():
         # HUD
         pygame.font.SysFont("fixed", size=8)
         elapsed = time.time() - start_time
-        hud_surf = font.render(f"Steps: {steps}  Time: {int(elapsed)}s  (R = regenerate)", True, (10, 10, 10))
+        hud_surf = font.render(f"Steps: {steps}  Time: {int(elapsed)}s  (R = regenerate, C = exit)", True, (10, 10, 10))
         screen.blit(hud_surf, (8, 480))
 
         if won:
