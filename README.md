@@ -1,6 +1,6 @@
 # Maze Game
 before playing,
-Make sure you have pygame.
+make sure you have pygame.
 and if you dont, please run this command:
 
 ```
