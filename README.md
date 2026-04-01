@@ -1,6 +1,7 @@
 # Maze Game
 before playing,
-do this command in cmd.exe
+Make sure you have pygame.
+and if you dont, please run this command:
 
 ```
 pip install pygame
