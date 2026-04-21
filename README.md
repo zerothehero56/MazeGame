@@ -1,8 +1,6 @@
-# Maze Game
-before playing,
-make sure you have pygame.
-and if you dont, please run this command:
+# incrediblytuffprojects
+so tuff 🤤🤤🤤
 
-```
-pip install pygame
-```
+project 1:
+maze.py
+
