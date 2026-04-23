@@ -1,4 +1,4 @@
-wins=3
+wins=0
 equipped_skin=0_Default.png
 owned_skins=0_Default.png
 secret_lebron_unlocked=1
