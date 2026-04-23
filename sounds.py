@@ -25,6 +25,8 @@ sound_sike = None
 sound_talary = None
 sound_siren = None
 sound_weave = None
+sound_aycaramba = None
+sound_eatmyshorts = None
 sound_lebronshine = None
 sound_rizzy = None
 sound_default = None
@@ -112,8 +114,3 @@ def load_next_sound():
     load_index += 1
     if load_index >= len(sound_queue):
         sounds_loaded = True
-# Define mixer channels for sound playback
-channel = pygame.mixer.Channel(1)
-canel   = pygame.mixer.Channel(4)
-chanel  = pygame.mixer.Channel(2)
-cannel  = pygame.mixer.Channel(3)

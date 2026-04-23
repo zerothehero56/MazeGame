@@ -9,20 +9,19 @@ import state
 # Function for the difficulty slider menu
 def slider():
     # Define fonts
-    font     = pygame.font.Font(None, 44)
-    sub_font = pygame.font.Font(None, 28)
-    # Background color
-    bg_col   = (50, 30, 30)
+    font = cfg.menu_styles['btn_font']
+    sub_font = cfg.menu_styles['sub_font']
+    key_font = cfg.menu_styles['key_font']
     # Pygame clock
     clock    = pygame.time.Clock()
     # Stop music
     pygame.mixer.stop()
 
     # Slider constants
-    MIN_SIZE = 1
+    MIN_SIZE = 5
     MAX_SIZE = 100
     # Current maze size, clamped to max
-    current  = min(cfg.MAZE_COLS, MAX_SIZE)
+    current = max(MIN_SIZE, min(cfg.MAZE_COLS, MAX_SIZE))
     # Slider position and dimensions
     slider_x = 100
     slider_y = 280
@@ -43,7 +42,7 @@ def slider():
         return round(MIN_SIZE + t * (MAX_SIZE - MIN_SIZE))
 
     # Dragging flag
-    dragging = True
+    dragging = False
     running  = True
     # Main loop
     while running:
@@ -89,27 +88,31 @@ def slider():
                 current = x_to_size(max(slider_x, min(slider_x + slider_w, mouse[0])))
 
         # Fill screen
-        cfg.screen.fill(bg_col)
+        cfg.draw_vertical_gradient(cfg.screen, cfg.THEME['bg_top'], cfg.THEME['bg_bottom'])
 
         # Render title
-        title = font.render("DIFFICULTY", True, (210, 210, 255))
+        title = font.render("DIFFICULTY", True, cfg.THEME['title'])
         cfg.screen.blit(title, title.get_rect(center=(cfg.WINDOW_W // 2, 80)))
 
         # Determine difficulty label and color based on size
         if current == 1:
-            diff_label = "Impossible"; diff_col = (255, 0, 0); state.winz = 0
+            diff_label = "Impossible"; diff_col = (220, 75, 75)
         elif current <= 10:
-            diff_label = "Easy";      diff_col = (80, 200, 80);   state.winz = 1
+            diff_label = "Easy";      diff_col = (95, 205, 120)
         elif current <= 20:
-            diff_label = "Medium";    diff_col = (255, 200, 40);  state.winz = 3
+            diff_label = "Medium";    diff_col = (245, 200, 95)
         elif current <= 40:
-            diff_label = "Hard";      diff_col = (255, 120, 40);  state.winz = 5
+            diff_label = "Hard";      diff_col = (245, 155, 95)
         elif current <= 60:
-            diff_label = "Insane";    diff_col = (220, 40, 40);   state.winz = 25
+            diff_label = "Insane";    diff_col = (230, 100, 100)
         elif current < 75:
-            diff_label = "Crazy";     diff_col = (0, 0, 0);       state.winz = 50
+            diff_label = "Crazy";     diff_col = (110, 170, 255)
         else:
-            diff_label = "Mentally Unstable"; diff_col = (255, 255, 255); state.winz = 100
+            diff_label = "Mentally Unstable"; diff_col = (190, 130, 255)
+
+        # Scale reward by maze size so larger mazes always pay more.
+        state.winz = max(1, current - 4)
+
         # Override winz if noclip
         if state.noclip == 1:
             state.winz = 0
@@ -117,29 +120,25 @@ def slider():
         # Render difficulty label
         label = font.render(f"{diff_label} ({current}x{current})", True, diff_col)
         cfg.screen.blit(label, label.get_rect(center=(cfg.WINDOW_W // 2, 200)))
+        reward_text = sub_font.render(f"Reward: +{state.winz} wins", True, cfg.THEME['muted_text'])
+        cfg.screen.blit(reward_text, reward_text.get_rect(center=(cfg.WINDOW_W // 2, 232)))
 
         # Draw slider background
-        pygame.draw.rect(cfg.screen, (60, 60, 80),
+        pygame.draw.rect(cfg.screen, cfg.THEME['panel_alt'],
                          (slider_x, slider_y - slider_h // 2, slider_w, slider_h), border_radius=4)
         # Draw filled part
         pygame.draw.rect(cfg.screen, diff_col,
                          (slider_x, slider_y - slider_h // 2, handle_x - slider_x, slider_h), border_radius=4)
         # Draw handle
-        pygame.draw.circle(cfg.screen, (210, 210, 255), (handle_x, slider_y), handle_r)
-        pygame.draw.circle(cfg.screen, diff_col,        (handle_x, slider_y), handle_r - 3)
-
-        # Update cell size
-        cfg.vis = max(1, current + 2)
+        pygame.draw.circle(cfg.screen, cfg.THEME['title'], (handle_x, slider_y), handle_r)
+        pygame.draw.circle(cfg.screen, diff_col, (handle_x, slider_y), handle_r - 3)
 
         # Draw confirm button
         hover = confirm_btn.collidepoint(mouse)
-        pygame.draw.rect(cfg.screen, (85, 85, 118) if hover else (55, 55, 78),
-                         confirm_btn, border_radius=10)
-        btn_txt = sub_font.render("Play!", True, (255, 255, 255))
-        cfg.screen.blit(btn_txt, btn_txt.get_rect(center=confirm_btn.center))
+        cfg.draw_button(cfg.screen, confirm_btn, "Play", "Enter", hover, sub_font, key_font)
 
         # Render hint text
-        hint = sub_font.render("<- -> to adjust | Enter to confirm", True, (120, 120, 150))
+        hint = sub_font.render("<- -> to adjust | Enter to confirm", True, cfg.THEME['muted_text'])
         cfg.screen.blit(hint, hint.get_rect(center=(cfg.WINDOW_W // 2, 440)))
 
         # Update display

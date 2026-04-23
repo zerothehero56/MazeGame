@@ -59,24 +59,29 @@ def load_data():
                         equipped_skin = value
                     elif key == "owned_skins":
                         # Split owned skins by comma
-                        owned_skins = value.split(",")
+                        owned_skins = [skin for skin in value.split(",") if skin]
                     elif key == "secret_lebron_unlocked":
                         # Parse as boolean
                         secret_lebron_unlocked = value == "1"
                     elif key == "bg_volume":
                         try:
-                            bg_volume = float(value)
+                            bg_volume = max(0.0, min(1.0, float(value)))
                         except ValueError:
                             bg_volume = config.DEFAULT_BG_VOLUME
                     elif key == "sfx_volume":
                         try:
-                            sfx_volume = float(value)
+                            sfx_volume = max(0.0, min(1.0, float(value)))
                         except ValueError:
                             sfx_volume = config.DEFAULT_SFX_VOLUME
                     elif key == "step_sounds_enabled":
                         step_sounds_enabled = value == "1"
                     elif key == "color_change_enabled":
                         color_change_enabled = value == "1"
+
+    if not owned_skins:
+        owned_skins = ["0_Default.png"]
+    if equipped_skin not in owned_skins:
+        equipped_skin = owned_skins[0]
 
 # Load data on module import
 load_data()

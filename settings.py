@@ -11,8 +11,7 @@ def settingsmenu():
     # Unpack menu styles
     btn_font = cfg.menu_styles['btn_font']
     sub_font = cfg.menu_styles['sub_font']
-    small_font = cfg.menu_styles['key_font']
-    bg_col = cfg.menu_styles['bg_col']
+    key_font = cfg.menu_styles['key_font']
     # Pygame clock
     clock    = pygame.time.Clock()
     # Stop music
@@ -98,48 +97,58 @@ def settingsmenu():
                     saves.sfx_volume = sfx_vol
 
         # Fill screen
-        cfg.screen.fill(bg_col)
+        cfg.draw_vertical_gradient(cfg.screen, cfg.THEME['bg_top'], cfg.THEME['bg_bottom'])
 
         # Render title
-        title = btn_font.render("SETTINGS", True, (210, 210, 255))
+        title = btn_font.render("SETTINGS", True, cfg.THEME['title'])
         cfg.screen.blit(title, title.get_rect(center=(cfg.WINDOW_W // 2, 80)))
 
         # BG Volume slider
-        label_bg = sub_font.render(f"BG Volume: {int(bg_vol * 100)}%", True, (255, 255, 255))
+        label_bg = sub_font.render(f"BG Volume: {int(bg_vol * 100)}%", True, cfg.THEME['button_text'])
         cfg.screen.blit(label_bg, (slider_x, slider_y_bg - 40))
-        pygame.draw.rect(cfg.screen, (60, 60, 80), (slider_x, slider_y_bg - slider_h // 2, slider_w, slider_h), border_radius=4)
+        pygame.draw.rect(cfg.screen, cfg.THEME['panel_alt'], (slider_x, slider_y_bg - slider_h // 2, slider_w, slider_h), border_radius=4)
         filled_w = vol_to_x(bg_vol) - slider_x
-        pygame.draw.rect(cfg.screen, (85, 85, 118), (slider_x, slider_y_bg - slider_h // 2, filled_w, slider_h), border_radius=4)
+        pygame.draw.rect(cfg.screen, cfg.THEME['button_hover'], (slider_x, slider_y_bg - slider_h // 2, filled_w, slider_h), border_radius=4)
         handle_bg_x = vol_to_x(bg_vol)
-        pygame.draw.circle(cfg.screen, (210, 210, 255), (handle_bg_x, slider_y_bg), handle_r)
-        pygame.draw.circle(cfg.screen, (85, 85, 118), (handle_bg_x, slider_y_bg), handle_r - 3)
+        pygame.draw.circle(cfg.screen, cfg.THEME['title'], (handle_bg_x, slider_y_bg), handle_r)
+        pygame.draw.circle(cfg.screen, cfg.THEME['button'], (handle_bg_x, slider_y_bg), handle_r - 3)
 
         # SFX Volume slider
-        label_sfx = sub_font.render(f"SFX Volume: {int(sfx_vol * 100)}%", True, (255, 255, 255))
+        label_sfx = sub_font.render(f"SFX Volume: {int(sfx_vol * 100)}%", True, cfg.THEME['button_text'])
         cfg.screen.blit(label_sfx, (slider_x, slider_y_sfx - 40))
-        pygame.draw.rect(cfg.screen, (60, 60, 80), (slider_x, slider_y_sfx - slider_h // 2, slider_w, slider_h), border_radius=4)
+        pygame.draw.rect(cfg.screen, cfg.THEME['panel_alt'], (slider_x, slider_y_sfx - slider_h // 2, slider_w, slider_h), border_radius=4)
         filled_w = vol_to_x(sfx_vol) - slider_x
-        pygame.draw.rect(cfg.screen, (85, 85, 118), (slider_x, slider_y_sfx - slider_h // 2, filled_w, slider_h), border_radius=4)
+        pygame.draw.rect(cfg.screen, cfg.THEME['button_hover'], (slider_x, slider_y_sfx - slider_h // 2, filled_w, slider_h), border_radius=4)
         handle_sfx_x = vol_to_x(sfx_vol)
-        pygame.draw.circle(cfg.screen, (210, 210, 255), (handle_sfx_x, slider_y_sfx), handle_r)
-        pygame.draw.circle(cfg.screen, (85, 85, 118), (handle_sfx_x, slider_y_sfx), handle_r - 3)
+        pygame.draw.circle(cfg.screen, cfg.THEME['title'], (handle_sfx_x, slider_y_sfx), handle_r)
+        pygame.draw.circle(cfg.screen, cfg.THEME['button'], (handle_sfx_x, slider_y_sfx), handle_r - 3)
 
         # Toggle buttons
         hover_step = step_btn.collidepoint(mouse)
-        pygame.draw.rect(cfg.screen, (85, 85, 118) if hover_step else (55, 55, 78), step_btn, border_radius=10)
-        step_text = sub_font.render(f"200&300 SFX: {'On' if saves.step_sounds_enabled else 'Off'}", True, (255, 255, 255))
-        cfg.screen.blit(step_text, step_text.get_rect(center=step_btn.center))
+        cfg.draw_button(
+            cfg.screen,
+            step_btn,
+            f"200&300 SFX: {'On' if saves.step_sounds_enabled else 'Off'}",
+            "",
+            hover_step,
+            sub_font,
+            key_font,
+        )
 
         hover_color = color_btn.collidepoint(mouse)
-        pygame.draw.rect(cfg.screen, (85, 85, 118) if hover_color else (55, 55, 78), color_btn, border_radius=10)
-        color_text = sub_font.render(f"Color Change: {'On' if saves.color_change_enabled else 'Off'}", True, (255, 255, 255))
-        cfg.screen.blit(color_text, color_text.get_rect(center=color_btn.center))
+        cfg.draw_button(
+            cfg.screen,
+            color_btn,
+            f"Color Change: {'On' if saves.color_change_enabled else 'Off'}",
+            "",
+            hover_color,
+            sub_font,
+            key_font,
+        )
 
         # Back button
         hover_back = back_btn.collidepoint(mouse)
-        pygame.draw.rect(cfg.screen, (85, 85, 118) if hover_back else (55, 55, 78), back_btn, border_radius=10)
-        back_text = sub_font.render("Back", True, (255, 255, 255))
-        cfg.screen.blit(back_text, back_text.get_rect(center=back_btn.center))
+        cfg.draw_button(cfg.screen, back_btn, "Back", "Esc", hover_back, sub_font, key_font)
 
         # Update display
         pygame.display.flip()
